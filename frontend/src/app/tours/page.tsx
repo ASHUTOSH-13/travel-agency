@@ -2,20 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import TourCard from '@/components/tours/TourCard'
-
-interface Tour {
-  id: number
-  slug: string
-  title: string
-  base_price: number
-  hero_image_url: string | null
-  destination_slug: string
-  destination_name: string
-  category_slug: string
-  category_name: string
-  short_description: string
-  is_featured: boolean
-}
+import { Tour } from '@/types/tour'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL
 
