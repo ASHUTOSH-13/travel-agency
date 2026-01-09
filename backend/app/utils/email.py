@@ -148,14 +148,12 @@ def send_enquiry_email(enquiry: dict):
 
         context = ssl.create_default_context()
 
-        with smtplib.SMTP_SSL(
-            EMAIL_HOST,
-            EMAIL_PORT,
-            context=context,
-            timeout=20
-        ) as server:
-            server.login(EMAIL_USERNAME, EMAIL_PASSWORD)
-            server.send_message(msg)
+        with smtplib.SMTP(EMAIL_HOST, EMAIL_PORT, timeout=20) as server:
+          server.ehlo()
+          server.starttls(context=context)
+          server.ehlo()
+          server.login(EMAIL_USERNAME, EMAIL_PASSWORD)
+          server.send_message(msg)
 
         print("✅ Enquiry email sent successfully")
 
