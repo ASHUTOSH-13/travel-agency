@@ -2,7 +2,7 @@ import os
 import smtplib
 from email.message import EmailMessage
 from dotenv import load_dotenv
-
+import ssl
 load_dotenv()
 
 EMAIL_HOST = os.getenv("EMAIL_HOST")
@@ -139,23 +139,27 @@ def enquiry_email_html(data: dict) -> str:
 
 
 def send_enquiry_email(enquiry: dict):
-    msg = EmailMessage()
-    msg["Subject"] = f"New Tour Enquiry – {enquiry['tour_title']}"
-    msg["From"] = EMAIL_USERNAME
-    msg["To"] = ADMIN_EMAIL
-    msg.set_content(enquiry_email_html(enquiry), subtype="html")
-  #  msg.set_content(f"""
-#New Tour Enquiry Received
+    try:
+        msg = EmailMessage()
+        msg["Subject"] = f"New Tour Enquiry – {enquiry['tour_title']}"
+        msg["From"] = EMAIL_USERNAME
+        msg["To"] = ADMIN_EMAIL
+        msg.set_content(enquiry_email_html(enquiry), subtype="html")
 
-#Name: {enquiry['full_name']}
-#Phone: {enquiry['phone']}
-#Email: {enquiry['email']}
-#Travellers: {enquiry['travelers']}
-#Preferred Dates: {enquiry['preferred_dates']}
-#Tour: {enquiry['tour_title']}
-#""")
+        context = ssl.create_default_context()
 
-    # ✅ SSL SMTP (NO starttls)
-    with smtplib.SMTP_SSL(EMAIL_HOST, EMAIL_PORT) as server:
-        server.login(EMAIL_USERNAME, EMAIL_PASSWORD)
-        server.send_message(msg)
+        with smtplib.SMTP_SSL(
+            EMAIL_HOST,
+            EMAIL_PORT,
+            context=context,
+            timeout=20
+        ) as server:
+            server.login(EMAIL_USERNAME, EMAIL_PASSWORD)
+            server.send_message(msg)
+
+        print("✅ Enquiry email sent successfully")
+
+    except Exception as e:
+        print("❌ Failed to send enquiry email:", str(e))
+
+
