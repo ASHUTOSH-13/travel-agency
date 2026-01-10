@@ -11,6 +11,17 @@ interface Props {
 }
 
 const PLACEHOLDER = '/placeholder-tour.jpg'
+const WISHLIST_KEY = 'lgb_wishlist'
+
+/* ================= TOAST ================= */
+
+function Toast({ message }: { message: string }) {
+  return (
+    <div className="fixed bottom-6 right-6 bg-black text-white px-4 py-2 rounded-lg shadow-lg text-sm z-[9999] animate-fade-in">
+      {message}
+    </div>
+  )
+}
 
 // Custom SVG Icons
 const Icons = {
@@ -36,13 +47,13 @@ const Icons = {
     </svg>
   ),
   Heart: ({ filled }: { filled?: boolean }) => (
-    <svg className="w-4 h-4" fill={filled ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-4 h-4" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
     </svg>
   ),
   Share: () => (
     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
     </svg>
   ),
   WhatsApp: () => (
@@ -53,6 +64,55 @@ const Icons = {
 }
 
 export default function TourCard({ tour }: Props) {
+  const [toast, setToast] = useState<string | null>(null)
+  const [isLiked, setIsLiked] = useState(false)
+
+
+   // ---------- INIT WISHLIST ----------
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem(WISHLIST_KEY) || '[]')
+    setIsLiked(stored.includes(tour.id))
+  }, [tour.id])
+
+  const showToast = (msg: string) => {
+    setToast(msg)
+    setTimeout(() => setToast(null), 2000)
+  }
+
+
+  // ---------- TOGGLE WISHLIST ----------
+  const toggleWishlist = () => {
+    const stored: number[] = JSON.parse(localStorage.getItem(WISHLIST_KEY) || '[]')
+
+    let updated: number[]
+    if (stored.includes(tour.id)) {
+      updated = stored.filter(id => id !== tour.id)
+      showToast('Removed from wishlist')
+    } else {
+      updated = [...stored, tour.id]
+      showToast('Added to wishlist ❤️')
+    }
+
+    localStorage.setItem(WISHLIST_KEY, JSON.stringify(updated))
+    setIsLiked(!isLiked)
+  }
+
+  // ---------- SHARE ----------
+  const handleShare = async () => {
+    const url = `${window.location.origin}/tours/${tour.destination_slug}/${tour.slug}`
+
+    if (navigator.share) {
+      await navigator.share({
+        title: tour.title,
+        text: 'Check out this tour on LetsGoBuddy',
+        url,
+      })
+    } else {
+      await navigator.clipboard.writeText(url)
+      showToast('Link copied to clipboard 🔗')
+    }
+  }
+  
   // ================= IMAGE SANITIZATION =================
   const images = (() => {
     const rawImages = tour.gallery_images ?? []
@@ -73,7 +133,6 @@ export default function TourCard({ tour }: Props) {
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [hovered, setHovered] = useState(false)
-  const [isLiked, setIsLiked] = useState(false)
 
   // ================= SLIDESHOW LOGIC =================
   useEffect(() => {
@@ -123,6 +182,7 @@ export default function TourCard({ tour }: Props) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={handleLeave}
     >
+      {toast && <Toast message={toast} />}
       {/* ================= IMAGE SECTION ================= */}
       <div className="relative h-72 overflow-hidden">
         {/* Image Slideshow */}
@@ -155,18 +215,20 @@ export default function TourCard({ tour }: Props) {
           {/* Right Side - Action Buttons Only */}
           <div className="flex items-start gap-2">
             <button 
-              onClick={() => setIsLiked(!isLiked)}
-              className="w-9 h-9 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
-              aria-label="Add to favorites"
-            >
-              <Icons.Heart filled={isLiked} />
-            </button>
+  onClick={toggleWishlist}
+  className="w-9 h-9 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
+  aria-label={isLiked ? 'Remove from wishlist' : 'Add to wishlist'}
+>
+  <Icons.Heart filled={isLiked} />
+</button>
             <button 
-              className="w-9 h-9 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
-              aria-label="Share tour"
-            >
-              <Icons.Share />
-            </button>
+  onClick={handleShare}
+  className="w-9 h-9 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
+  aria-label="Share tour"
+>
+  <Icons.Share />
+</button>
+
           </div>
         </div>
 

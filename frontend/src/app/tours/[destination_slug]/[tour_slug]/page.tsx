@@ -2,6 +2,7 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import EnquiryForm from './EnquiryForm'
 import { MapPin, Clock, Star, Heart, Share2, Check, X, Users, Calendar, Phone, Mail, Shield, Award, TrendingUp, ChevronRight } from 'lucide-react'
+import TourActions from './TourActions'
 
 interface ItineraryDay {
   day_number: number
@@ -96,14 +97,11 @@ export default async function TourDetailPage({
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <button className="p-3 rounded-full border-2 border-gray-300 hover:border-red-500 hover:text-red-500 transition-all group">
-                <Heart className="w-5 h-5 group-hover:fill-current" />
-              </button>
-              <button className="p-3 rounded-full border-2 border-gray-300 hover:border-blue-500 hover:text-blue-500 transition-all">
-                <Share2 className="w-5 h-5" />
-              </button>
-            </div>
+            <TourActions
+  tourId={tour.id}
+  tourTitle={tour.title}
+  tourUrl={`${process.env.NEXT_PUBLIC_SITE_URL}/tours/${tour.destination_slug}/${tour.slug}`}
+/>
           </div>
 
           {/* Image Gallery */}
