@@ -1,11 +1,6 @@
-import { Metadata } from 'next'
+'use client'
+import { useRef, useState } from 'react'
 import { CreditCard, Settings, XCircle, Hotel, Shield, HelpCircle, Search, Phone, Mail, MessageCircle } from 'lucide-react'
-
-export const metadata: Metadata = {
-  title: 'FAQs | LetsGoBuddy',
-  description:
-    'Frequently asked questions about tour bookings, payments, cancellations, hotels, transport and travel support.',
-}
 
 const FAQS = [
   {
@@ -123,6 +118,55 @@ const FAQS = [
 ]
 
 export default function FAQPage() {
+  const [query, setQuery] = useState('')
+  const [noResult, setNoResult] = useState(false)
+  const faqRefs = useRef<HTMLDetailsElement[]>([])
+  const helpRef = useRef<HTMLDivElement | null>(null)
+    const handleSearch = () => {
+    const search = query.trim().toLowerCase()
+    if (!search) return
+
+    setNoResult(false)
+
+    let foundIndex = -1
+
+    // Flatten FAQ structure
+    let index = 0
+    for (const section of FAQS) {
+      for (const item of section.items) {
+        if (
+          item.q.toLowerCase().includes(search) ||
+          item.a.toLowerCase().includes(search)
+        ) {
+          foundIndex = index
+          break
+        }
+        index++
+      }
+      if (foundIndex !== -1) break
+    }
+
+    if (foundIndex !== -1 && faqRefs.current[foundIndex]) {
+      const el = faqRefs.current[foundIndex]
+
+      // Open the FAQ
+      el.open = true
+
+      // Scroll smoothly
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+
+      // Optional highlight
+      el.classList.add('ring-2', 'ring-blue-400')
+      setTimeout(() => {
+        el.classList.remove('ring-2', 'ring-blue-400')
+      }, 1500)
+    } else {
+      // No result → scroll to help section
+      setNoResult(true)
+      helpRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
   return (
     <main className="bg-gray-50 min-h-screen">
       {/* HERO */}
@@ -153,12 +197,22 @@ export default function FAQPage() {
             <div className="relative">
               <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
-                type="text"
-                placeholder="Search for answers..."
-                className="w-full pl-14 pr-6 py-4 rounded-full text-gray-900 placeholder-gray-500 shadow-xl focus:outline-none focus:ring-4 focus:ring-white/30"
-              />
+  type="text"
+  placeholder="Search for answers..."
+  value={query}
+  onChange={(e) => setQuery(e.target.value)}
+  onKeyDown={(e) => {
+    if (e.key === 'Enter') handleSearch()
+  }}
+  className="w-full pl-14 pr-6 py-4 rounded-full text-gray-900 placeholder-gray-500 shadow-xl focus:outline-none focus:ring-4 focus:ring-white/30"
+/>
             </div>
           </div>
+          {noResult && (
+  <p className="mt-4 text-sm text-white/90">
+    We couldn’t find an exact answer. Try contacting our support team below.
+  </p>
+)}
         </div>
       </section>
 
@@ -204,38 +258,56 @@ export default function FAQPage() {
             </div>
 
             {/* FAQ Items */}
-            <div className="space-y-4">
-              {section.items.map((faq, i) => (
-                <details
-                  key={i}
-                  className="group bg-white rounded-2xl shadow-md hover:shadow-lg transition-all border border-gray-100"
-                >
-                  <summary className="flex justify-between items-start cursor-pointer p-6">
-                    <div className="flex-1 pr-4">
-                      <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">
-                        {faq.q}
-                      </h3>
-                    </div>
-                    <div className={`flex-shrink-0 w-8 h-8 rounded-full ${section.bgColor} ${section.textColor} flex items-center justify-center group-open:rotate-45 transition-transform font-bold text-xl`}>
-                      +
-                    </div>
-                  </summary>
-                  <div className="px-6 pb-6">
-                    <div className={`border-l-4 ${section.textColor.replace('text', 'border')} pl-4 py-2`}>
-                      <p className="text-gray-700 leading-relaxed">
-                        {faq.a}
-                      </p>
-                    </div>
-                  </div>
-                </details>
-              ))}
-            </div>
+<div className="space-y-4">
+  {section.items.map((faq, i) => {
+    const globalIndex =
+      FAQS.slice(0, idx).reduce((acc, s) => acc + s.items.length, 0) + i
+
+    return (
+      <details
+        key={i}
+        ref={(el) => {
+          if (el) faqRefs.current[globalIndex] = el
+        }}
+        className="group bg-white rounded-2xl shadow-md hover:shadow-lg transition-all border border-gray-100"
+      >
+        <summary className="flex justify-between items-start cursor-pointer p-6">
+          <div className="flex-1 pr-4">
+            <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">
+              {faq.q}
+            </h3>
+          </div>
+
+          <div
+            className={`flex-shrink-0 w-8 h-8 rounded-full ${section.bgColor} ${section.textColor} flex items-center justify-center group-open:rotate-45 transition-transform font-bold text-xl`}
+          >
+            +
+          </div>
+        </summary>
+
+        <div className="px-6 pb-6">
+          <div
+            className={`border-l-4 ${section.textColor.replace(
+              'text',
+              'border'
+            )} pl-4 py-2`}
+          >
+            <p className="text-gray-700 leading-relaxed">{faq.a}</p>
+          </div>
+        </div>
+      </details>
+    )
+  })}
+</div>
           </div>
         ))}
       </section>
 
       {/* Still Have Questions CTA */}
-      <section className="bg-gradient-to-r from-blue-600 to-indigo-600 py-16">
+      <section
+  ref={helpRef}
+  className="bg-gradient-to-r from-blue-600 to-indigo-600 py-16"
+>
         <div className="max-w-4xl mx-auto px-6 text-center text-white">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Still Have Questions?
@@ -291,7 +363,7 @@ export default function FAQPage() {
               title="Privacy Policy"
               description="How we protect your data"
               icon="🔒"
-              href="/privacy"
+              href="/privacy-policy"
             />
             <ResourceCard
               title="Travel Tips"
