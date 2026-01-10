@@ -6,6 +6,11 @@ class TourListResponse(BaseModel):
     slug: str
     title: str
     base_price: float
+    rating: float | None
+    duration_days: int
+    duration_nights: int
+    min_group_size: int | None
+    max_group_size: int | None
     hero_image_url: Optional[str]
     gallery_images: list[str]
     destination_slug: str
@@ -25,6 +30,11 @@ class TourDetailResponse(BaseModel):
     slug: str
     title: str
     base_price: float
+    rating: float | None
+    duration_days: int
+    duration_nights: int
+    min_group_size: int | None
+    max_group_size: int | None
     destination_slug: str
     destination_name: str
     category_slug: str

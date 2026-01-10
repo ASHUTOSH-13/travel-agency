@@ -11,5 +11,11 @@ export interface Tour {
   category_name: string
   short_description: string
   is_featured: boolean
+  duration_days?: number
+  duration_nights?: number
+  min_group_size?: number
+  max_group_size?: number
+  rating?: number
+  highlights?: string[]
 }
 

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Numeric, Boolean, ForeignKey, Text
+from sqlalchemy import Column, Float, Integer, String, Numeric, Boolean, ForeignKey, Text
 from app.core.database import Base
 from sqlalchemy import DateTime
 from datetime import datetime
@@ -23,6 +23,11 @@ class Tour(Base):
     title = Column(String)
     short_description = Column(Text)
     base_price = Column(Numeric(10,2))
+    rating = Column(Float)
+    duration_nights = Column(Integer)
+    duration_days = Column(Integer)
+    min_group_size = Column(Integer)
+    max_group_size = Column(Integer)
     destination_id = Column(Integer, ForeignKey("destinations.id"))
     is_featured = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
