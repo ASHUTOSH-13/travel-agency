@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Heart } from 'lucide-react'
 
 const NAV_ITEMS = [
   { label: 'Tours', href: '/tours' },
@@ -12,30 +12,59 @@ const NAV_ITEMS = [
   { label: 'About', href: '/about' },
 ]
 
+const WISHLIST_KEY = 'lgb_wishlist'
+
 export default function Header() {
   const pathname = usePathname()
   const isHome = pathname === '/'
 
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [wishlistCount, setWishlistCount] = useState(0)
 
+  // ---------------- SCROLL EFFECT ----------------
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // ---------------- WISHLIST COUNT ----------------
+  const loadWishlistCount = () => {
+    const stored = JSON.parse(
+      localStorage.getItem(WISHLIST_KEY) || '[]'
+    )
+    setWishlistCount(stored.length)
+  }
+
+  useEffect(() => {
+  loadWishlistCount()
+
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === WISHLIST_KEY) {
+      loadWishlistCount()
+    }
+  }
+
+  const onWishlistUpdate = () => {
+    loadWishlistCount()
+  }
+
+  window.addEventListener('storage', onStorage)
+  window.addEventListener('lgb:wishlist-updated', onWishlistUpdate)
+
+  return () => {
+    window.removeEventListener('storage', onStorage)
+    window.removeEventListener('lgb:wishlist-updated', onWishlistUpdate)
+  }
+}, [])
+
+
   // Header background logic
   const headerBg =
     scrolled || !isHome || menuOpen
       ? 'bg-black/80 backdrop-blur shadow-lg'
       : 'bg-transparent'
-
-  // Logo logic
-  const logoSrc =
-    scrolled || !isHome || menuOpen
-      ? '/logo_lets_go_buddy.png'
-      : '/logo_lets_go_buddy.png'
 
   return (
     <header
@@ -45,7 +74,7 @@ export default function Header() {
         {/* LOGO */}
         <Link href="/" className="flex items-center gap-3">
           <Image
-            src={logoSrc}
+            src="/logo_lets_go_buddy.png"
             alt="LetsGoBuddy"
             width={48}
             height={48}
@@ -75,6 +104,21 @@ export default function Header() {
               </Link>
             )
           })}
+
+          {/* ❤️ Wishlist */}
+          <Link
+            href="/wishlist"
+            className="relative text-white/90 hover:text-red-400 transition-colors"
+            aria-label="Wishlist"
+          >
+            <Heart className="w-6 h-6" />
+
+            {wishlistCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                {wishlistCount}
+              </span>
+            )}
+          </Link>
         </nav>
 
         {/* MOBILE MENU BUTTON */}
@@ -108,6 +152,22 @@ export default function Header() {
                 </Link>
               )
             })}
+
+            {/* ❤️ Wishlist (Mobile) */}
+            <Link
+              href="/wishlist"
+              onClick={() => setMenuOpen(false)}
+              className="flex items-center gap-3 text-lg font-semibold text-white/90 hover:text-red-400 transition-colors"
+            >
+              <Heart className="w-6 h-6" />
+              <span>Wishlist</span>
+
+              {wishlistCount > 0 && (
+                <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
           </nav>
         </div>
       )}

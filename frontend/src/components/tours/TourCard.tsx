@@ -70,9 +70,14 @@ export default function TourCard({ tour }: Props) {
 
    // ---------- INIT WISHLIST ----------
   useEffect(() => {
+  const sync = () => {
     const stored = JSON.parse(localStorage.getItem(WISHLIST_KEY) || '[]')
     setIsLiked(stored.includes(tour.id))
-  }, [tour.id])
+  }
+
+  window.addEventListener('storage', sync)
+  return () => window.removeEventListener('storage', sync)
+}, [tour.id])
 
   const showToast = (msg: string) => {
     setToast(msg)
@@ -94,6 +99,7 @@ export default function TourCard({ tour }: Props) {
     }
 
     localStorage.setItem(WISHLIST_KEY, JSON.stringify(updated))
+    window.dispatchEvent(new Event('lgb:wishlist-updated'))
     setIsLiked(!isLiked)
   }
 
@@ -217,7 +223,7 @@ export default function TourCard({ tour }: Props) {
             <button 
   onClick={toggleWishlist}
   className="w-9 h-9 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
-  aria-label={isLiked ? 'Remove from wishlist' : 'Add to wishlist'}
+  aria-label="Toggle wishlist"
 >
   <Icons.Heart filled={isLiked} />
 </button>
