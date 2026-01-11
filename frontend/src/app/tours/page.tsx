@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import TourCard from '@/components/tours/TourCard'
+import CustomPackageModal from '@/components/custom-package/CustomPackageModal'
 import { Tour } from '@/types/tour'
 import { Search, SlidersHorizontal, MapPin, Sparkles, TrendingUp, Award, Grid3x3, List } from 'lucide-react'
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL
@@ -22,6 +23,7 @@ export default function ToursPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const resultsRef = useRef<HTMLDivElement | null>(null)
+  const [open, setOpen] = useState(false)
 
 const scrollToResults = () => {
   setTimeout(() => {
@@ -339,9 +341,13 @@ const filteredTours = tours.filter((tour) => {
           <p className="text-lg opacity-95 mb-8">
             Let us create a custom tour package just for you. Our travel experts are here to help!
           </p>
-          <button className="bg-white text-orange-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-all shadow-xl hover:shadow-2xl transform hover:scale-105">
-            Request Custom Package
-          </button>
+          <button
+        onClick={() => setOpen(true)}
+        className="bg-white text-orange-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-all shadow-xl hover:scale-105"
+      >
+        Request Custom Package
+      </button>
+      <CustomPackageModal open={open} onClose={() => setOpen(false)} />
         </div>
       </section>
     </main>

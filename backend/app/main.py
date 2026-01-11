@@ -25,10 +25,14 @@ app.add_middleware(
 # Import routers AFTER middleware
 from app.routers import tours, enquiries
 from app.routers import admin_auth
+from app.routers import custom_package_enquiries
+
 
 app.include_router(tours.router, prefix="/api", tags=["tours"])
 app.include_router(enquiries.router, prefix="/api", tags=["enquiries"])
 app.include_router(admin_auth.router, prefix="/api", tags=["admin"])
+app.include_router(custom_package_enquiries.router)
+
 
 @app.get("/health")
 def health():

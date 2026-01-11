@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import List, Optional
 
 class TourListResponse(BaseModel):
@@ -51,3 +51,13 @@ class EnquiryCreate(BaseModel):
     travelers: int
     preferred_dates: str
     tour_id: int
+
+class CustomPackageEnquiryCreate(BaseModel):
+    full_name: str
+    email: EmailStr
+    phone: str
+    destination: str | None = None
+    budget: str
+    travel_dates: str
+    travelers: int
+    message: str | None = None

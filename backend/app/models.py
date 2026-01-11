@@ -2,6 +2,7 @@ from sqlalchemy import Column, Float, Integer, String, Numeric, Boolean, Foreign
 from app.core.database import Base
 from sqlalchemy import DateTime
 from datetime import datetime
+from sqlalchemy.sql import func
 
 class Category(Base):
     __tablename__ = "categories"
@@ -69,3 +70,24 @@ class Enquiry(Base):
     travelers = Column(Integer)
     preferred_dates = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class CustomPackageEnquiry(Base):
+    __tablename__ = "custom_package_enquiries"
+
+    id = Column(Integer, primary_key=True, index=True)
+    full_name = Column(String, nullable=False)
+    email = Column(String, nullable=False)
+    phone = Column(String, nullable=False)
+    destination = Column(String, nullable=True)
+    budget = Column(String, nullable=False)
+    travel_dates = Column(String, nullable=False)
+    travelers = Column(Integer, nullable=False)
+    message = Column(Text, nullable=True)
+
+    # ✅ Supabase will auto-fill this
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False
+    )
