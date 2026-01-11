@@ -32,7 +32,7 @@ def create_enquiry(
         email=payload.email,
         travelers=payload.travelers,
         preferred_dates=payload.preferred_dates,
-        created_at=datetime.utcnow().isoformat(),
+        created_at=datetime.utcnow(),
     )
 
     db.add(enquiry)

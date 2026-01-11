@@ -1,17 +1,23 @@
 import os
-import smtplib
-from email.message import EmailMessage
-from xmlrpc import server
+#import smtplib
+#from email.message import EmailMessage
+#from xmlrpc import server
 from dotenv import load_dotenv
-import ssl
+#import ssl
+import resend
 load_dotenv()
 
-EMAIL_HOST = os.getenv("EMAIL_HOST")
-EMAIL_PORT = int(os.getenv("EMAIL_PORT"))
-EMAIL_USERNAME = os.getenv("EMAIL_USERNAME")
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
-ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
+#EMAIL_HOST = os.getenv("EMAIL_HOST")
+#EMAIL_PORT = int(os.getenv("EMAIL_PORT"))
+#EMAIL_USERNAME = os.getenv("EMAIL_USERNAME")
+#EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+#ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
 
+
+resend.api_key = os.getenv("RESEND_API_KEY")
+
+SENDER = "LetsGoBuddy <onboarding@resend.dev>"
+ADMIN_EMAIL = "ashutoshkalash03@gmail.com"
 
 def enquiry_email_html(data: dict) -> str:
     return f"""
@@ -139,16 +145,27 @@ def enquiry_email_html(data: dict) -> str:
     """
 
 
+# def send_enquiry_email(enquiry: dict):
+#    msg = EmailMessage() 
+#    msg["Subject"] = f"New Tour Enquiry – {enquiry['tour_title']}" 
+#    msg["From"] = EMAIL_USERNAME 
+#    msg["To"] = ADMIN_EMAIL 
+#    msg.set_content(enquiry_email_html(enquiry), subtype="html") 
+#    # msg.set_content(f""" #New Tour Enquiry Received #Name: {enquiry['full_name']} #Phone: {enquiry['phone']} #Email: {enquiry['email']} #Travellers: {enquiry['travelers']} #Preferred Dates: {enquiry['preferred_dates']} #Tour: {enquiry['tour_title']} #""") # ✅ SSL SMTP (NO starttls) 
+#    with smtplib.SMTP_SSL(EMAIL_HOST, EMAIL_PORT) as server: 
+#     server.login(EMAIL_USERNAME, EMAIL_PASSWORD) 
+#     server.send_message(msg)
+
+
 def send_enquiry_email(enquiry: dict):
-   msg = EmailMessage() 
-   msg["Subject"] = f"New Tour Enquiry – {enquiry['tour_title']}" 
-   msg["From"] = EMAIL_USERNAME 
-   msg["To"] = ADMIN_EMAIL 
-   msg.set_content(enquiry_email_html(enquiry), subtype="html") 
-   # msg.set_content(f""" #New Tour Enquiry Received #Name: {enquiry['full_name']} #Phone: {enquiry['phone']} #Email: {enquiry['email']} #Travellers: {enquiry['travelers']} #Preferred Dates: {enquiry['preferred_dates']} #Tour: {enquiry['tour_title']} #""") # ✅ SSL SMTP (NO starttls) 
-   with smtplib.SMTP_SSL(EMAIL_HOST, EMAIL_PORT) as server: 
-    server.login(EMAIL_USERNAME, EMAIL_PASSWORD) 
-    server.send_message(msg)
+    resend.Emails.send({
+        "from": SENDER,
+        "to": [ADMIN_EMAIL],
+        "reply_to": enquiry["email"],
+        "subject": f"New Tour Enquiry – {enquiry['tour_title']}",
+        "html": enquiry_email_html(enquiry),
+    })
+
 
 
 def custom_package_email_html(data: dict) -> str:
@@ -640,32 +657,51 @@ def custom_package_user_confirmation_html(data: dict) -> str:
 
 
 
+# def send_custom_package_email(data: dict):
+#     # ADMIN EMAIL
+#     admin_msg = EmailMessage()
+#     admin_msg["Subject"] = "New Custom Tour Package Request"
+#     admin_msg["From"] = EMAIL_USERNAME
+#     admin_msg["To"] = ADMIN_EMAIL
+#     admin_msg.set_content(
+#         custom_package_email_html(data),
+#         subtype="html"
+#     )
+
+#     with smtplib.SMTP_SSL(EMAIL_HOST, EMAIL_PORT) as server:
+#         server.login(EMAIL_USERNAME, EMAIL_PASSWORD)
+#         server.send_message(admin_msg)
+
+#     # USER CONFIRMATION EMAIL
+#     user_msg = EmailMessage()
+#     user_msg["Subject"] = "We received your custom tour request"
+#     user_msg["From"] = EMAIL_USERNAME
+#     user_msg["To"] = data["email"]
+#     user_msg.set_content(
+#         custom_package_user_confirmation_html(data),
+#         subtype="html"
+#     )
+
+#     with smtplib.SMTP_SSL(EMAIL_HOST, EMAIL_PORT) as server:
+#         server.login(EMAIL_USERNAME, EMAIL_PASSWORD)
+#         server.send_message(user_msg)
+
+
+
 def send_custom_package_email(data: dict):
     # ADMIN EMAIL
-    admin_msg = EmailMessage()
-    admin_msg["Subject"] = "New Custom Tour Package Request"
-    admin_msg["From"] = EMAIL_USERNAME
-    admin_msg["To"] = ADMIN_EMAIL
-    admin_msg.set_content(
-        custom_package_email_html(data),
-        subtype="html"
-    )
-
-    with smtplib.SMTP_SSL(EMAIL_HOST, EMAIL_PORT) as server:
-        server.login(EMAIL_USERNAME, EMAIL_PASSWORD)
-        server.send_message(admin_msg)
+    resend.Emails.send({
+        "from": SENDER,
+        "to": [ADMIN_EMAIL],
+        "reply_to": data["email"],
+        "subject": "🧳 New Custom Tour Package Request",
+        "html": custom_package_email_html(data),
+    })
 
     # USER CONFIRMATION EMAIL
-    user_msg = EmailMessage()
-    user_msg["Subject"] = "We received your custom tour request"
-    user_msg["From"] = EMAIL_USERNAME
-    user_msg["To"] = data["email"]
-    user_msg.set_content(
-        custom_package_user_confirmation_html(data),
-        subtype="html"
-    )
-
-    with smtplib.SMTP_SSL(EMAIL_HOST, EMAIL_PORT) as server:
-        server.login(EMAIL_USERNAME, EMAIL_PASSWORD)
-        server.send_message(user_msg)
-
+    resend.Emails.send({
+        "from": SENDER,
+        "to": [data["email"]],
+        "subject": "✈️ We received your custom tour request",
+        "html": custom_package_user_confirmation_html(data),
+    })
