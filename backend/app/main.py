@@ -16,7 +16,9 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "https://lets-go-buddy-frontend.onrender.com",
         "https://travel-agency-uq8b.onrender.com",
-        "https://letsgobuddytravels.vercel.app"
+        "https://letsgobuddytravels.vercel.app",
+        "https://letsgobuddytravels.com",
+        "https://www.letsgobuddytravels.com"
     ],
     allow_credentials=True,
     allow_methods=["*"],
