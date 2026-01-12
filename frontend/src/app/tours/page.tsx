@@ -47,7 +47,10 @@ const scrollToResults = () => {
             : `${API_BASE}/api/tours?category_slug=${encodeURIComponent(filter)}`
 
         const res = await fetch(url, { cache: 'no-store' })
-
+        console.log(
+              "API BASE URL:",
+              process.env.NEXT_PUBLIC_API_BASE_URL
+            )
         if (!res.ok) {
           throw new Error(`Failed to fetch tours (${res.status})`)
         }
