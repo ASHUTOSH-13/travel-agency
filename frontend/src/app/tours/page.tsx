@@ -5,7 +5,7 @@ import TourCard from '@/components/tours/TourCard'
 import CustomPackageModal from '@/components/custom-package/CustomPackageModal'
 import { Tour } from '@/types/tour'
 import { Search, SlidersHorizontal, MapPin, Sparkles, TrendingUp, Award, Grid3x3, List } from 'lucide-react'
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL
+//const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL
 
 const categories = [
   { slug: 'all', name: 'All Tours', icon: '🌍' },
@@ -39,18 +39,19 @@ const scrollToResults = () => {
     const fetchTours = async () => {
       setLoading(true)
       setError(null)
-
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL
+      if (!apiBase) {
+  throw new Error("API base URL is missing")
+}
       try {
         const url =
-          filter === 'all'
-            ? `${API_BASE}/api/tours`
-            : `${API_BASE}/api/tours?category_slug=${encodeURIComponent(filter)}`
+  filter === 'all'
+    ? `${apiBase}/api/tours`
+    : `${apiBase}/api/tours?category_slug=${encodeURIComponent(filter)}`
+console.log("Fetching tours from:", url)
+
 
         const res = await fetch(url, { cache: 'no-store' })
-        console.log(
-              "API BASE URL:",
-              process.env.NEXT_PUBLIC_API_BASE_URL
-            )
         if (!res.ok) {
           throw new Error(`Failed to fetch tours (${res.status})`)
         }
