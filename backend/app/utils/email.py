@@ -14,10 +14,15 @@ load_dotenv()
 #ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
 
 
+# resend.api_key = os.getenv("RESEND_API_KEY")
+
+# SENDER = "LetsGoBuddy <onboarding@resend.dev>"
+# ADMIN_EMAIL = "ashutoshkalash03@gmail.com"
+
 resend.api_key = os.getenv("RESEND_API_KEY")
 
-SENDER = "LetsGoBuddy <onboarding@resend.dev>"
-ADMIN_EMAIL = "ashutoshkalash03@gmail.com"
+SENDER = f"LetsGoBuddy <{os.getenv('RESEND_FROM_EMAIL')}>"
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
 
 def enquiry_email_html(data: dict) -> str:
     return f"""
