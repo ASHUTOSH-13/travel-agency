@@ -10,6 +10,11 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'LetsGoBuddy Travels',
   description: 'Best tour packages Himachal, Rajasthan & more',
+  icons: {
+    icon: '/favicon.png',        // browser tab
+    apple: '/favicon.png',       // iOS / Safari
+    shortcut: '/favicon.png',    // legacy support
+  },
 }
 
 export default function RootLayout({
