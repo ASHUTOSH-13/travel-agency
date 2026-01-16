@@ -31,40 +31,38 @@ export default function Header() {
 
   // ---------------- WISHLIST COUNT ----------------
   const loadWishlistCount = () => {
-    const stored = JSON.parse(
-      localStorage.getItem(WISHLIST_KEY) || '[]'
-    )
+    const stored = JSON.parse(localStorage.getItem(WISHLIST_KEY) || '[]')
     setWishlistCount(stored.length)
   }
 
   useEffect(() => {
-  loadWishlistCount()
-
-  const onStorage = (e: StorageEvent) => {
-    if (e.key === WISHLIST_KEY) {
-      loadWishlistCount()
-    }
-  }
-
-  const onWishlistUpdate = () => {
     loadWishlistCount()
-  }
 
-  window.addEventListener('storage', onStorage)
-  window.addEventListener('lgb:wishlist-updated', onWishlistUpdate)
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === WISHLIST_KEY) loadWishlistCount()
+    }
 
-  return () => {
-    window.removeEventListener('storage', onStorage)
-    window.removeEventListener('lgb:wishlist-updated', onWishlistUpdate)
-  }
-}, [])
+    const onWishlistUpdate = () => loadWishlistCount()
 
+    window.addEventListener('storage', onStorage)
+    window.addEventListener('lgb:wishlist-updated', onWishlistUpdate)
 
-  // Header background logic
+    return () => {
+      window.removeEventListener('storage', onStorage)
+      window.removeEventListener('lgb:wishlist-updated', onWishlistUpdate)
+    }
+  }, [])
+
+  // ---------------- HEADER BACKGROUND ----------------
   const headerBg =
     scrolled || !isHome || menuOpen
       ? 'bg-black/80 backdrop-blur shadow-lg'
-      : 'bg-transparent'
+      : 'bg-black/30 backdrop-blur-sm'
+
+  const brandTextColor =
+    scrolled || !isHome || menuOpen
+      ? 'text-white'
+      : 'text-white'
 
   return (
     <header
@@ -76,12 +74,14 @@ export default function Header() {
           <Image
             src="/logo_lets_go_buddy.png"
             alt="LetsGoBuddy"
-            width={48}
-            height={48}
+            width={65}
+            height={65}
             priority
-            className="object-contain"
+            className="object-contain -translate-y-0.5"
           />
-          <span className="text-white text-xl font-extrabold tracking-wide">
+          <span
+            className={`text-xl font-extrabold tracking-wide ${brandTextColor}`}
+          >
             LetsGoBuddy
           </span>
         </Link>
@@ -112,7 +112,6 @@ export default function Header() {
             aria-label="Wishlist"
           >
             <Heart className="w-6 h-6" />
-
             {wishlistCount > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
                 {wishlistCount}
@@ -161,7 +160,6 @@ export default function Header() {
             >
               <Heart className="w-6 h-6" />
               <span>Wishlist</span>
-
               {wishlistCount > 0 && (
                 <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                   {wishlistCount}
