@@ -105,15 +105,17 @@ export default function EnquiryForm({ tourId, tourTitle }: Props) {
 
   /* ================= UI ================= */
   return (
-    <div className="bg-white p-8 rounded-3xl shadow-xl">
-      <h3 className="text-2xl font-bold mb-2">Enquire Now</h3>
-      <p className="text-sm text-gray-600 mb-6">
+    <div className="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-xl dark:shadow-none border border-transparent dark:border-white/10">
+      <h3 className="text-2xl font-bold mb-2 text-gray-900 dark:text-gray-100">
+        Enquire Now
+      </h3>
+      <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
         Get best price & details for <b>{tourTitle}</b>
       </p>
 
       {success ? (
-        <div className="p-4 rounded-xl bg-green-50 text-green-700 font-semibold">
-          ✅ Enquiry submitted successfully!  
+        <div className="p-4 rounded-xl bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-semibold">
+          ✅ Enquiry submitted successfully!
           <br />
           Our team will contact you shortly.
         </div>
@@ -153,10 +155,10 @@ export default function EnquiryForm({ tourId, tourTitle }: Props) {
               onChange={e =>
                 setForm({ ...form, preferred_dates: e.target.value })
               }
-              className={`w-full p-3 rounded-xl border ${
+              className={`w-full p-3 rounded-xl border bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 ${
                 errors.preferred_dates
                   ? 'border-red-500'
-                  : 'border-gray-300'
+                  : 'border-gray-300 dark:border-white/20'
               }`}
             >
               <option value="">Preferred Travel Dates</option>
@@ -219,10 +221,10 @@ function Field({
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className={`w-full p-3 rounded-xl border focus:outline-none focus:ring-2 ${
+        className={`w-full p-3 rounded-xl border bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 ${
           error
             ? 'border-red-500 focus:ring-red-300'
-            : 'border-gray-300 focus:ring-blue-300'
+            : 'border-gray-300 dark:border-white/20 focus:ring-blue-300'
         }`}
       />
       {error && (
